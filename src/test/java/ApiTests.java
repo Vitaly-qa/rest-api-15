@@ -88,7 +88,8 @@ public class ApiTests {
                 .log().uri()
 
                 .when()
-                .get("/users?page=2")
+                .queryParam("page", "2")
+                .get("/users")
 
                 .then()
                 .log().status()
