@@ -58,29 +58,29 @@ public class ApiTests {
         createUserData.setName("Vitaly");
         createUserData.setJob("QA Engineer");
 
-        UserDataResponseModel response =  step("Делаем запрос", () -> {
-        return given(loginRequestSpec)
+        UserDataResponseModel response = step("Делаем запрос", () -> {
+            return given(loginRequestSpec)
 
-                .body(createUserData)
-                .contentType(JSON)
+                    .body(createUserData)
+                    .contentType(JSON)
 
-                .when()
-                .log().uri()
-                .post("/user")
+                    .when()
+                    .log().uri()
+                    .post("/user")
 
-                .then()
-                .spec(loginResponseSpec)
+                    .then()
+                    .spec(loginResponseSpec)
 
-                .statusCode(201)
+                    .statusCode(201)
 
-                .extract().as(UserDataResponseModel.class);
+                    .extract().as(UserDataResponseModel.class);
         });
 
         step("Проверяем ответ", () -> {
-                assertEquals("Vitaly", response.getName());
-                assertEquals("QA Engineer", response.getJob());
-                assertNotNull(response.getId());
-                assertNotNull(response.getCreatedAt());
+            assertEquals("Vitaly", response.getName());
+            assertEquals("QA Engineer", response.getJob());
+            assertNotNull(response.getId());
+            assertNotNull(response.getCreatedAt());
         });
     }
 
@@ -91,18 +91,18 @@ public class ApiTests {
         step("Проверяем что пользователь не найден", () -> {
 
             given(loginRequestSpec)
-                .log().uri()
+                    .log().uri()
 
-                .when()
-                .delete("users/2")
+                    .when()
+                    .delete("users/2")
 
-                .then()
+                    .then()
 
                     .spec(loginResponseSpec)
 
 
-                .statusCode(204)
-                .body(emptyOrNullString());
+                    .statusCode(204)
+                    .body(emptyOrNullString());
         });
     }
 
@@ -115,16 +115,16 @@ public class ApiTests {
             given(loginRequestSpec)
                     .log().uri()
 
-                .when()
-                .queryParam("page", "2")
-                .get("/users")
+                    .when()
+                    .queryParam("page", "2")
+                    .get("/users")
 
-                .then()
+                    .then()
                     .spec(loginResponseSpec)
 
 
-                .statusCode(200)
-                .body("data", notNullValue());
+                    .statusCode(200)
+                    .body("data", notNullValue());
         });
 
     }
@@ -135,29 +135,29 @@ public class ApiTests {
 
         UserResponseDataModel response = step("Делаем запрос", () -> {
 
-               return given(loginRequestSpec)
+            return given(loginRequestSpec)
 
-                .log().uri()
+                    .log().uri()
 
-                .when()
-                .get("/unknown/6")
+                    .when()
+                    .get("/unknown/6")
 
-                .then()
-                       .spec(loginResponseSpec)
+                    .then()
+                    .spec(loginResponseSpec)
 
 
-                .statusCode(200)
+                    .statusCode(200)
 
-                .extract().as(UserResponseDataModel.class);
+                    .extract().as(UserResponseDataModel.class);
         });
 
-             step("Проверяем ответ", () -> {
+        step("Проверяем ответ", () -> {
 
-                 assertEquals("6", response.getId());
-                assertEquals("blue turquoise", response.getName());
-                assertEquals("2005", response.getYear());
-                assertEquals("#53B0AE", response.getColor());
-                assertEquals("15-5217", response.getPantone_value());
+            assertEquals("6", response.getId());
+            assertEquals("blue turquoise", response.getName());
+            assertEquals("2005", response.getYear());
+            assertEquals("#53B0AE", response.getColor());
+            assertEquals("15-5217", response.getPantone_value());
         });
     }
 }
