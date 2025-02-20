@@ -1,14 +1,20 @@
 package tests;
 
 import io.restassured.RestAssured;
+import models.lombok.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static specs.LoginSpec.loginRequestSpec;
+import static specs.LoginSpec.loginResponseSpec;
 
 
 public class ApiTests {
@@ -21,32 +27,40 @@ public class ApiTests {
 
     @Test
     @DisplayName("Успешное создание нового пользователя")
-    void registrationTest() {
-        String registrationData = "{\"email\": \"eve.holt@reqres.in\",\"password\": \"pistol\"}";
+    void registrationLoginWithStepsSpecsTest() {
+        LoginBodyLombokModel registrationData = new LoginBodyLombokModel();
+        registrationData.setEmail("eve.holt@reqres.in");
+        registrationData.setPassword("pistol");
 
-        given()
-                .body(registrationData)
-                .contentType(JSON)
+        LoginResponseLombokModel response = step("Делаем запрос", () -> {
+            return given(loginRequestSpec)
+                    .body(registrationData)
 
-                .when()
-                .log().uri()
-                .post("/register")
+                    .when()
 
-                .then()
-                .log().status()
-                .log().body()
-                .statusCode(200)
-                .body("id", is(4))
-                .body("token", is("QpwL5tke4Pnpja7X4"));
+                    .post("/register")
 
-
+                    .then()
+                    .spec(loginResponseSpec)
+                    .extract().as(LoginResponseLombokModel.class);
+        });
+        step("Проверяем ответ", () -> {
+            assertEquals("4", response.getId());
+            assertEquals("QpwL5tke4Pnpja7X4", response.getToken());
+        });
     }
+
 
     @Test
     @DisplayName("Успешное создание пользователя")
     void successfulUserCreationTest() {
-        String createUserData = "{\"name\":\"Vitaly\",\"job\":\"QA Engineer\"}";
-        given()
+        UserDataModel createUserData = new UserDataModel();
+        createUserData.setName("Vitaly");
+        createUserData.setJob("QA Engineer");
+
+        UserDataResponseModel response =  step("Делаем запрос", () -> {
+        return given(loginRequestSpec)
+
                 .body(createUserData)
                 .contentType(JSON)
 
@@ -55,70 +69,96 @@ public class ApiTests {
                 .post("/user")
 
                 .then()
-                .log().status()
-                .log().body()
-                .statusCode(201)
-                .body("name", is("Vitaly"))
-                .body("job", is("QA Engineer"))
-                .body("id", notNullValue())
-                .body("createdAt", notNullValue())
-                .extract().path("id");
+                .spec(loginResponseSpec)
 
+                .statusCode(201)
+
+                .extract().as(UserDataResponseModel.class);
+        });
+
+        step("Проверяем ответ", () -> {
+                assertEquals("Vitaly", response.getName());
+                assertEquals("QA Engineer", response.getJob());
+                assertNotNull(response.getId());
+                assertNotNull(response.getCreatedAt());
+        });
     }
 
     @Test
     @DisplayName("Успешное удаление пользователя")
     void successfulDeleteUserTest() {
-        given()
+
+        step("Проверяем что пользователь не найден", () -> {
+
+            given(loginRequestSpec)
                 .log().uri()
 
                 .when()
                 .delete("users/2")
 
                 .then()
-                .log().status()
-                .log().body()
+
+                    .spec(loginResponseSpec)
+
+
                 .statusCode(204)
                 .body(emptyOrNullString());
+        });
     }
 
     @Test
     @DisplayName("Не пустой список пользователей")
     void listUsersNotNullTest() {
-        given()
-                .log().uri()
+
+        step("Проверяем отображение не пустого списка", () -> {
+
+            given(loginRequestSpec)
+                    .log().uri()
 
                 .when()
                 .queryParam("page", "2")
                 .get("/users")
 
                 .then()
-                .log().status()
-                .log().body()
+                    .spec(loginResponseSpec)
+
+
                 .statusCode(200)
                 .body("data", notNullValue());
+        });
+
     }
 
     @Test
     @DisplayName("Успешная проверка пользователя в данных")
     void successfulVerificationOfTheUserInTheDataTest() {
-        given()
+
+        UserResponseDataModel response = step("Делаем запрос", () -> {
+
+               return given(loginRequestSpec)
+
                 .log().uri()
 
                 .when()
                 .get("/unknown/6")
 
                 .then()
-                .log().status()
-                .log().body()
+                       .spec(loginResponseSpec)
+
+
                 .statusCode(200)
-                .body("data.id", is(6))
-                .body("data.name", is("blue turquoise"))
-                .body("data.year", is(2005))
-                .body("data.color", is("#53B0AE"))
-                .body("data.pantone_value", is("15-5217"));
 
+                .extract().as(UserResponseDataModel.class);
+        });
 
+             step("Проверяем ответ", () -> {
+
+                 assertEquals("6", response.getId());
+                assertEquals("blue turquoise", response.getName());
+                assertEquals("2005", response.getYear());
+                assertEquals("#53B0AE", response.getColor());
+                assertEquals("15-5217", response.getPantone_value());
+        });
     }
 }
 
