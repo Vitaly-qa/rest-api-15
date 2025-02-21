@@ -19,10 +19,22 @@ public class LoginSpec {
             .log().headers()
             .contentType(JSON);
 
-    public static ResponseSpecification loginResponseSpec = new ResponseSpecBuilder()
+    public static ResponseSpecification loginResponseStatusCod200Spec = new ResponseSpecBuilder()
+            .expectStatusCode(200)
             .log(STATUS)
             .log(BODY)
             .build();
 
+    public static ResponseSpecification loginResponseStatusCod201Spec = new ResponseSpecBuilder()
+            .expectStatusCode(201)
+            .log(STATUS)
+            .log(BODY)
+            .build();
+
+    public static ResponseSpecification loginResponseStatusCod204Spec = new ResponseSpecBuilder()
+            .expectStatusCode(204)
+            .log(STATUS)
+            .log(BODY)
+            .build();
 
 }

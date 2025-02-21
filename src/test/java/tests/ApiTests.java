@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import models.lombok.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import static io.qameta.allure.Allure.step;
@@ -13,9 +14,9 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static specs.LoginSpec.loginRequestSpec;
-import static specs.LoginSpec.loginResponseSpec;
+import static specs.LoginSpec.*;
 
+@Tag("Api_tests")
 
 public class ApiTests {
 
@@ -41,7 +42,7 @@ public class ApiTests {
                     .post("/register")
 
                     .then()
-                    .spec(loginResponseSpec)
+                    .spec(loginResponseStatusCod200Spec)
                     .extract().as(LoginResponseLombokModel.class);
         });
         step("Проверяем ответ", () -> {
@@ -69,9 +70,7 @@ public class ApiTests {
                     .post("/user")
 
                     .then()
-                    .spec(loginResponseSpec)
-
-                    .statusCode(201)
+                    .spec(loginResponseStatusCod201Spec)
 
                     .extract().as(UserDataResponseModel.class);
         });
@@ -98,10 +97,8 @@ public class ApiTests {
 
                     .then()
 
-                    .spec(loginResponseSpec)
+                    .spec(loginResponseStatusCod204Spec)
 
-
-                    .statusCode(204)
                     .body(emptyOrNullString());
         });
     }
@@ -120,10 +117,8 @@ public class ApiTests {
                     .get("/users")
 
                     .then()
-                    .spec(loginResponseSpec)
+                    .spec(loginResponseStatusCod200Spec)
 
-
-                    .statusCode(200)
                     .body("data", notNullValue());
         });
 
@@ -143,10 +138,8 @@ public class ApiTests {
                     .get("/unknown/6")
 
                     .then()
-                    .spec(loginResponseSpec)
+                    .spec(loginResponseStatusCod200Spec)
 
-
-                    .statusCode(200)
 
                     .extract().as(UserResponseDataModel.class);
         });
