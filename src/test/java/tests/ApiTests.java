@@ -146,11 +146,11 @@ public class ApiTests {
 
         step("Проверяем ответ", () -> {
 
-            assertEquals("6", response.getId());
-            assertEquals("blue turquoise", response.getName());
-            assertEquals("2005", response.getYear());
-            assertEquals("#53B0AE", response.getColor());
-            assertEquals("15-5217", response.getPantone_value());
+            assertEquals("6", response.getData().getId());
+            assertEquals("blue turquoise", response.getData().getName());
+            assertEquals("2005", response.getData().getYear());
+            assertEquals("#53B0AE", response.getData().getColor());
+            assertEquals("15-5217", response.getData().getPantoneValue());
         });
     }
 }
